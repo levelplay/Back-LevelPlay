@@ -22,14 +22,6 @@ export class UserController  {
         res.status(HttpStatus.ok).json(successMessage(users, ''));
     }
 
-    async adminAddCredit(req: Request, res: Response){
-        const user = await this._userService.addCredit(req.body.userId, req.body.points);
-        if(user){
-            await this._emailService.points(user.email, req.body.points.toString());
-        }
-        res.status(HttpStatus.ok).json(successMessage(null, 'Points added'));
-    }
-
     async userDelete(req: Request, res: Response){
         await this._userService.userDelete(req.params.id);
         res.status(HttpStatus.ok).json(successMessage(null, 'User Deleted'));
@@ -39,12 +31,6 @@ export class UserController  {
         await this._userService.adminBlock(req.body.userId);
         res.status(HttpStatus.ok).json(successMessage(null, 'User updated'));
     }
-
-    async updateWaterMark(req: Request, res: Response){
-        await this._userService.updateWaterMark(req.body.userId, req.body.watermark);
-        res.status(HttpStatus.ok).json(successMessage(null, 'User updated'));
-    }
-
 
     async updateUser(req: Request, res: Response){
         const user: any = req?.user;
