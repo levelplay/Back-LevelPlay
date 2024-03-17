@@ -8,15 +8,16 @@ export class EmailService {
     constructor() {
         this.transporter = createTransport({
             port: envVariables.email.port,
-            secure: false,
+            secure: true,
             host: envVariables.email.host,
             auth: {
                 user: envVariables.email.user,
                 pass: envVariables.email.password
             },
-            tls: {
-                ciphers:'SSLv3'
-            }
+            // tls: {
+            //     ciphers:'SSLv3'
+            // },
+            debug: true
         });
     }
 
