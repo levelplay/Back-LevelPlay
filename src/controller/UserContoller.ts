@@ -1,0 +1,66 @@
+import {Request, Response} from 'express';
+import { HttpStatus} from "../core/env-variables";
+import { successMessage } from "../core/HttpFunction";
+import {UserService} from "../services/UserService";
+import UsersModel from '../schema/UsersModel';
+import {EmailService} from "../email-service/EmailService";
+export class UserController  {
+    _userService: UserService;
+    _emailService: EmailService;
+    constructor() {
+        this._userService = new UserService();
+        this._emailService = new EmailService();
+    }
+
+    async getUsers(req: Request, res: Response){
+        const users = await this._userService.getUsers(req.query as any);
+        res.status(HttpStatus.ok).json(successMessage({users}, ''));
+    }
+
+    async getUsersFilter(req: Request, res: Response){
+        const users = await this._userService.getUsersFilter( req.body);
+        res.status(HttpStatus.ok).json(successMessage(users, ''));
+    }
+
+    async adminAddCredit(req: Request, res: Response){
+        const user = await this._userService.addCredit(req.body.userId, req.body.points);
+        if(user){
+            await this._emailService.points(user.email, req.body.points.toString());
+        }
+        res.status(HttpStatus.ok).json(successMessage(null, 'Points added'));
+    }
+
+    async userDelete(req: Request, res: Response){
+        await this._userService.userDelete(req.params.id);
+        res.status(HttpStatus.ok).json(successMessage(null, 'User Deleted'));
+    }
+
+    async adminBlock(req: Request, res: Response){
+        await this._userService.adminBlock(req.body.userId);
+        res.status(HttpStatus.ok).json(successMessage(null, 'User updated'));
+    }
+
+    async updateWaterMark(req: Request, res: Response){
+        await this._userService.updateWaterMark(req.body.userId, req.body.watermark);
+        res.status(HttpStatus.ok).json(successMessage(null, 'User updated'));
+    }
+
+
+    async updateUser(req: Request, res: Response){
+        const user: any = req?.user;
+        await this._userService.updateUser(user?._id, req.body);
+        res.status(HttpStatus.ok).json(successMessage(null, 'User Updated'));
+    }
+
+    async updateProfile(req: Request, res: Response){
+        const user: any = req?.user;
+        await this._userService.updateProfile(user?._id, req.file?.path || '');
+        res.status(HttpStatus.ok).json(successMessage(null, 'User Updated'));
+    }
+
+    async deleteMe(req: Request, res: Response){
+        const user: any = req?.user;
+        await UsersModel.updateOne({_id: user._id}, {$set: {deletedAt: new Date()}})
+        res.status(HttpStatus.ok).json(successMessage('User Deleted', ''));
+    }
+}
