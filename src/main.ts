@@ -8,21 +8,24 @@ import * as mongoose from 'mongoose';
 import passport from "passport";
 import './auth/passport-user';
 import bodyParser from "body-parser";
-
+import { Server } from "socket.io";
+import { createServer }  from 'node:http';
+import { SocketService } from './services/SocketService';
 // Initialize the express engine
-const app: express.Application = express();
-app.use('/uploads', express.static('uploads'))
+const exp: express.Application = express();
+const socketService = new SocketService();
+exp.use('/uploads', express.static('uploads'))
 // add middlewares
-app.use(passport.initialize());
+exp.use(passport.initialize());
 // app.use(helmet({}));
-app.use(bodyParser.json({}));
-app.use(cors({
+exp.use(bodyParser.json({}));
+exp.use(cors({
   // origin: envVariables.urls.split(','),
   origin: '*',
   allowedHeaders: '*',
   methods: ['POST', 'GET', "PUT", 'HEAD', 'DELETE'],
 }));
-app.use(compression());
+exp.use(compression());
 // add database services
 mongoose.connect(envVariables.databases.url).then(async ()=>{
   console.log('database connected');
@@ -32,14 +35,24 @@ mongoose.connect(envVariables.databases.url).then(async ()=>{
 
 // security for express
 
-app.disable('x-powered-by');
-app.get('/api', (req, res)=>{
+exp.disable('x-powered-by');
+exp.get('/api', (req, res)=>{
   res.send('ok');
 })
 // add routers
 routers.forEach((e)=>{
-  app.use(`/api/${e.path}` , e.router);
+  exp.use(`/api/${e.path}` , e.router);
 });
+const app = createServer(exp);
+const io = new Server(app, {
+  cors: {
+    origin: '*'
+  }
+});
+
+io.on('connection', socketService.connented.bind(socketService))
+// io.on('disconnect', socketService.disconnected.bind(socketService))
+
 // Server setup
 app.listen(envVariables.port, () => {
   console.log(`Server is running http://localhost:${envVariables.port}/`);
