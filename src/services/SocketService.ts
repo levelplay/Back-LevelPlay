@@ -114,14 +114,16 @@ export class SocketService {
           otherClient?.player2?.client.emit('gameLose', '' );
           const user = await UsersModel.findOne({email:  otherClient?.player1.email });
           if(user){
-            await UsersModel.updateOne({id: user.id}, {$set: {win: user.win + 1}});
+          console.log(user);
+            await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
           }
         }else{
           otherClient?.player2?.client.emit('gameWin', '' );
           otherClient?.player1?.client.emit('gameLose', '' );
           const user = await UsersModel.findOne({email:  otherClient?.player2?.email });
           if(user){
-            await UsersModel.updateOne({id: user.id}, {$set: {win: user.win + 1}});
+          console.log(user);
+            await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
           }
         }
         this.tiktakTok.splice(index, 1);
