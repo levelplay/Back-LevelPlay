@@ -16,6 +16,7 @@ export interface IUser extends Document{
   deletedAt?: Date,
   lastActive: Date,
   role: number,
+  win: number
 }
 
 const modelSchema = new Schema<IUser>({
@@ -33,6 +34,10 @@ const modelSchema = new Schema<IUser>({
   role: {
     type: Schema.Types.Number,
     required: [true, 'Role is Required'],
+  },
+  win: {
+    type: Schema.Types.Number,
+    default: 0
   },
   provider: {
     type: Schema.Types.String,
