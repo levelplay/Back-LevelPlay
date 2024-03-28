@@ -17,6 +17,11 @@ export class UserController  {
         res.status(HttpStatus.ok).json(successMessage({users}, ''));
     }
 
+    async leaderboard(req: Request, res: Response){
+        const users = await UsersModel.find({}).sort({win: -1}).limit(10).select(['username', 'win']);
+        res.status(HttpStatus.ok).json(successMessage({users}, ''));
+    }
+
     async getUsersFilter(req: Request, res: Response){
         const users = await this._userService.getUsersFilter( req.body);
         res.status(HttpStatus.ok).json(successMessage(users, ''));

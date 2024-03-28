@@ -39,6 +39,8 @@ export class SocketService {
   disconnected(id: string) {
     const filter = this.connectedUsers.filter(e=> e.clientId != id);
     this.connectedUsers = filter;
+    const gameFilters = this.waitingUser.filter(e=> e.player1.clientId != id && (e.player2 == null || e.player2.clientId != id));
+    this.waitingUser = gameFilters;
   }
 
   async addEmail(id: string,  data: string) {
@@ -108,13 +110,11 @@ export class SocketService {
         otherClient?.player1?.client.emit('gameRes', JSON.stringify({ data: res.data, turn: 1 }) );
       }
       if(win){
-        console.log('win', res.turn,res.turn == 1 )
         if(res.turn == 1){
           otherClient?.player1?.client.emit('gameWin', '' );
           otherClient?.player2?.client.emit('gameLose', '' );
           const user = await UsersModel.findOne({email:  otherClient?.player1.email });
           if(user){
-          console.log(user);
             await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
           }
         }else{
@@ -122,7 +122,6 @@ export class SocketService {
           otherClient?.player1?.client.emit('gameLose', '' );
           const user = await UsersModel.findOne({email:  otherClient?.player2?.email });
           if(user){
-          console.log(user);
             await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
           }
         }
