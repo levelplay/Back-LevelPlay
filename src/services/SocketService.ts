@@ -131,9 +131,11 @@ export class SocketService {
   async addToWatingListOrCreateRoom(id: string,  data: string) {
     const res = JSON.parse(data);
     const client = this.connectedUsers.find(e=> e.clientId == id);
+    console.log(client);
     if(!client){
       return;
     }
+    console.log(res.user);
     if(res.user && res.user != '' ){
       const user = await UsersModel.findOne({username: res.user});
       if(!user){
