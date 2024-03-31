@@ -5,6 +5,7 @@ import {errorMessage} from "./HttpFunction";
 
 export const userRegister = Joi.object({
     email: Joi.string().required().email(),
+    username: Joi.string().required(),
     code: Joi.string().required(),
     password: Joi.string().min(6)
 })

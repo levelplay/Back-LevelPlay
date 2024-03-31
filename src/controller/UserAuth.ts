@@ -38,7 +38,7 @@ export class UserAuth extends Auth {
             res.status(HttpStatus.badRequest).json(errorMessage('Invalid otp'));
             return;
         }
-        const oldUser = await this._userService.getUserByEmail( body.email);
+        let oldUser = await this._userService.getUserByEmail( body.email);
         if(oldUser){
             if(oldUser.deletedAt){
                 res.status(HttpStatus.badRequest).json(errorMessage('Your account deleted. Please contact admin.'));
@@ -47,7 +47,12 @@ export class UserAuth extends Auth {
             res.status(HttpStatus.badRequest).json(errorMessage('User already exist'));
             return;
         }
-        const user = await this._userService.createUser(body.email,  body.email.split('@')[0],body.password);
+        oldUser = await this._userService.getUserByUsename( body.username);
+        if(oldUser){
+            res.status(HttpStatus.badRequest).json(errorMessage('User already exist'));
+            return;
+        }
+        const user = await this._userService.createUser(body.email,  body.username ,body.password);
         return this.createToken(user, user.role, res);
     }
 

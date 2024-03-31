@@ -6,6 +6,7 @@ type connectedUsers = {
   client: Socket,
   clientId: string,
   email?: string,
+  username?: string
 };
 type watingList = {
   player1: connectedUsers,
@@ -28,17 +29,19 @@ export class SocketService {
     socket.on('turn', (data)=> this.turn(socket.id, data));
     socket.on('disconnect', (reson: DisconnectReason, description: any) => this.disconnected(socket.id));
     let email = ''
+    let username = ''
     if (socket.handshake.auth.token && socket.handshake.auth.token != '') {
       const token = await RefrachTokenModel.findOne({token: socket.handshake.auth.token});
       if(token){
         const user = await UsersModel.findById(token.userId);
         email = user?.email || '';
+        username = user?.username || '';
       }
     }
     if(email!= ''){
       this.connectedUsers = this.connectedUsers.filter(e=> e.email != email);
     }
-    this.connectedUsers.push({ email, clientId: socket.id, client: socket });
+    this.connectedUsers.push({ email, clientId: socket.id, client: socket, username });
     console.log(this.connectedUsers.map(e=> e.email));
   }
   disconnected(id: string) {
@@ -62,17 +65,20 @@ export class SocketService {
   async addEmail(id: string,  data: string) {
     const result = JSON.parse(data);
     let email = ''
+    let username = ''
     if (result.token && result.token != '') {
       const token = await RefrachTokenModel.findOne({token: result.token});
       if(token){
         const user = await UsersModel.findById(token.userId);
         email = user?.email || '';
+        username = user?.username || '';
       }
     }
     this.connectedUsers = this.connectedUsers.filter(e=> e.email != result.email);
     this.connectedUsers.map(e=> {
       if(e.clientId == id){
-        e.email = result.email
+        e.email = email;
+        e.username = username;
       }
     });
   }
@@ -120,7 +126,6 @@ export class SocketService {
       const index = this.tiktakTok.indexOf(otherClient);
       this.tiktakTok[index].data = res.data;
       const win = playerWin(this.tiktakTok[index].data, res.turn);
-      console.log(this.tiktakTok[index].data, res.turn, win);
       if(res.turn == 1){
         otherClient?.player2?.client.emit('gameRes', JSON.stringify({ data: res.data, turn: 2 }) );
       }else{
@@ -148,19 +153,15 @@ export class SocketService {
   async addToWatingListOrCreateRoom(id: string,  data: string) {
     const res = JSON.parse(data);
     const client = this.connectedUsers.find(e=> e.clientId == id);
-    console.log(client);
     if(!client){
       return;
     }
-    console.log(res.user);
     if(res.user && res.user != '' ){
       const user = await UsersModel.findOne({username: res.user});
-      console.log(user);
       if(!user){
         client?.client.emit('error', 'User not Found');
         return;
       }
-      console.log( this.connectedUsers.map(e=> e.email));
       const otherClient = this.connectedUsers.find(e=> e.email == user.email);
       if(!otherClient){
         client?.client.emit('error', 'User not Found');
@@ -186,8 +187,8 @@ export class SocketService {
       player2: client,
       data: []
     });
-    single.player1.client.emit('start-tiktakTok', `player=player1&email=${client.email}`);
-    client.client.emit('start-tiktakTok', `player=player2&email=${single.player1.email}`);
+    single.player1.client.emit('start-tiktakTok', `player=player1&email=${client.username}`);
+    client.client.emit('start-tiktakTok', `player=player2&email=${single.player1.username}`);
   }
 }
 

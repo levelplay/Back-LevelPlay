@@ -61,6 +61,9 @@ export class UserService {
     async getUserByEmail(email: string){
         return UsersModel.findOne({email: email });
     }
+    async getUserByUsename(username: string){
+        return UsersModel.findOne({username: username });
+    }
    
     async createUser(email: string, username: string, password: string) {
         const model = new UsersModel({email, password, isVerified: true, 
