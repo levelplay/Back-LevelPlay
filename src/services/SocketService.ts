@@ -27,6 +27,7 @@ export class SocketService {
     socket.on('challenge', (data)=> this.challenge(socket.id, data));
     socket.on('reject', (data)=> this.reject(socket.id, data));
     socket.on('turn', (data)=> this.turn(socket.id, data));
+    socket.on('quit', (data)=> this.quit(socket.id));
     socket.on('disconnect', (reson: DisconnectReason, description: any) => this.disconnected(socket.id));
     let email = ''
     let username = ''
@@ -50,7 +51,26 @@ export class SocketService {
     this.connectedUsers = filter;
     const gameFilters = this.waitingUser.filter(e=> e.player1.clientId != id && (e.player2 == null || e.player2.clientId != id));
     this.waitingUser = gameFilters;
-    console.log(this.connectedUsers.map(e=> e.email));
+  }
+  async quit(id: string){
+    const otherClient = this.tiktakTok.find((e)=> e.player1.clientId == id || e.player2?.clientId == id);
+    if(otherClient){
+      if(otherClient.player1.clientId == id){
+        otherClient?.player2?.client.emit('gameWin', '' );
+        const user = await UsersModel.findOne({email:  otherClient?.player2?.email });
+        if(user){
+          await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
+        }
+      }else{
+        otherClient?.player1?.client.emit('gameWin', '' );
+        const user = await UsersModel.findOne({email:  otherClient?.player1?.email });
+        if(user){
+          await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
+        }
+      }
+      const index = this.tiktakTok.indexOf(otherClient);
+      this.tiktakTok.slice(index, 1);
+    }
   }
   reject(id: string,data: string){
     const client = this.connectedUsers.find(e=> e.clientId == id);
@@ -111,8 +131,8 @@ export class SocketService {
         player2: otherClient.player2,
         data: []
       });
-      otherClient.player1.client.emit('start-tiktakTok', `player=player1&email=${client.email}`);
-      client.client.emit('start-tiktakTok', `player=player2&email=${otherClient.player1.email}`);
+      otherClient.player1.client.emit('start-tiktakTok', `player=player1&username=${client.username}&email=${client.email}`);
+      client.client.emit('start-tiktakTok', `player=player2&email=${otherClient.player1.email}&username=${otherClient.player1.username}`);
     }
   }
   async turn(id: string,  data: string){
@@ -187,8 +207,8 @@ export class SocketService {
       player2: client,
       data: []
     });
-    single.player1.client.emit('start-tiktakTok', `player=player1&email=${client.username}`);
-    client.client.emit('start-tiktakTok', `player=player2&email=${single.player1.username}`);
+    single.player1.client.emit('start-tiktakTok', `player=player1&username=${client.username}&email=${client.email}`);
+    client.client.emit('start-tiktakTok', `player=player2&username=${single.player1.username}&email=${single.player1.email}`);
   }
 }
 
