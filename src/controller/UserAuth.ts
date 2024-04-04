@@ -81,7 +81,7 @@ export class UserAuth extends Auth {
                 return;
             }
             await this._otpService.createOtp(query.email, otp, OtpRoles.NEW_ACCOUNT);
-            // await this._email.otp(query.email, otp);
+            await this._email.otp(query.email, otp);
             res.send(successMessage(null, 'Please check email.'));
         }else{
             if(user){

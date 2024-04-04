@@ -5,7 +5,7 @@
   "main": "main",
   "scripts": {
     "clean": "npx rimraf ./dist/",
-    "pm2": "npm run build && pm2 start ./dist/main.js --name gameServer",
+    "pm2": "npm run build && pm2 start ./dist/main.js --name gameS",
     "prebuild": "npm run clean",
     "postbuild": "node tools/copy.js",
     "start": "node ./dist/main.js",
