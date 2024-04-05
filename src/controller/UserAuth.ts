@@ -86,7 +86,7 @@ export class UserAuth extends Auth {
         }else{
             if(user){
                 await this._otpService.createOtp(query.email, otp, OtpRoles.FORGET_PASSWORD);
-                // await this._email.otp(query.email, otp);
+                 await this._email.otp(query.email, otp);
                 res.send(successMessage(null, 'Please check email.'));
             }
         }

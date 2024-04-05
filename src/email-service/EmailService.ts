@@ -22,7 +22,7 @@ export class EmailService {
     }
 
     async otp(to: string, code: string){
-         await this.transporter.sendMail({
+        const data =  await this.transporter.sendMail({
             to: to,
             from: envVariables.email.from,
             subject: "Verification",

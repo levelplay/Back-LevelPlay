@@ -97,8 +97,10 @@ export class SocketService {
     this.connectedUsers = this.connectedUsers.filter(e=> e.email != result.email);
     this.connectedUsers.map(e=> {
       if(e.clientId == id){
+        console.log(e);
         e.email = email;
         e.username = username;
+        console.log(e);
       }
     });
   }
@@ -112,6 +114,11 @@ export class SocketService {
       const otherClient = this.waitingUser.find(e=> e.player1.email == res.user && e.player2?.email == client.email );
       if(!otherClient){
         client?.client.emit('error', 'User not Found');
+        return;
+      }
+      const runningGame =this.tiktakTok.find(e=> e.player1.email == res.user && e.player2?.email == client.email);
+      if(runningGame){
+        client?.client.emit('error', 'Alredy in Game');
         return;
       }
       if(res.accept == false){
@@ -201,7 +208,7 @@ export class SocketService {
       this.waitingUser.push({player1: client, player2: null});
       return;
     }
-
+    this.waitingUser =  this.waitingUser.filter(e=> e.player1.clientId != single.player1.clientId);
     this.tiktakTok.push({
       player1: single.player1,
       player2: client,
