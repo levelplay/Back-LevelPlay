@@ -1,7 +1,7 @@
 #!/bin/bash
 git stash;
 git pull origin main;
-pm2 stop gameServer;
-pm2 delete gameServer;
+pm2 delete gameS;
 npm install;
 npm run pm2;
+cd ../level-play
