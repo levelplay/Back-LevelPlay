@@ -61,10 +61,15 @@ cron.schedule('1 */5 * * * *', async ()=>{
   const user = await UsersModel.find({ win: { $ne: 0 } }).sort({win: -1}).limit(3);
   console.log('1111', user.length , user.length > 0 );
   if( user.length  > 0){
-    const newWinModel = new WinModel({ data: user.map(e=> ({ username: e.username, wins: e.tempWin, userId: e.id })),  createdAt: new Date()  })
-    await newWinModel.save();
-    const dat = await UsersModel.updateMany({}, { $set: { win: 0 } });
-    console.log(dat);
+    try{
+      console.log('aaaaaaaaaa');
+      const newWinModel = new WinModel({ data: user.map(e=> ({ username: e.username, wins: e.tempWin, userId: e.id })),  createdAt: new Date()  })
+      await newWinModel.save();
+      const dat = await UsersModel.updateMany({}, { $set: { win: 0 } });
+      console.log(dat);
+    }catch(e){
+      console.log(e);
+    }
   }
 });
 
