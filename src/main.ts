@@ -57,12 +57,13 @@ io.on('connection', socketService.connented.bind(socketService))
 // io.on('disconnect', socketService.disconnected.bind(socketService))
 
 // for 6 hour * * */6 * * *
-cron.schedule('* */5 * * * *', async ()=>{
-  const user = await UsersModel.find().sort({tempOrder: -1}).limit(10);
-  if( user ){
+cron.schedule('1 */5 * * * *', async ()=>{
+  const user = await UsersModel.find({ win: { $ne: 0 } }).sort({win: -1}).limit(3);
+  console.log('1111', user.length );
+  if( user.length ){
     const newWinModel = new WinModel({ data: user.map(e=> ({ username: e.username, wins: e.tempWin, userId: e.id })),  createdAt: new Date()  })
     await newWinModel.save();
-    await UsersModel.updateMany({}, { $set: { tempWin: 0 } });
+    await UsersModel.updateMany({}, { $set: { win: 0 } });
   }
 });
 

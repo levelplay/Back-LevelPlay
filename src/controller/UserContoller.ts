@@ -19,7 +19,7 @@ export class UserController  {
     }
 
     async leaderboard(req: Request, res: Response){
-        const users = await UsersModel.find({}).sort({tempWin: -1}).limit(10).select(['username', 'win']);
+        const users = await UsersModel.find({ win: { $ne: 0 } }).sort({win: -1}).limit(10).select(['username', 'win']);
         res.status(HttpStatus.ok).json(successMessage({users}, ''));
     }
 
