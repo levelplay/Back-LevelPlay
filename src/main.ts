@@ -58,9 +58,9 @@ io.on('connection', socketService.connented.bind(socketService))
 
 // for 6 hour * * */6 * * *
 cron.schedule('* */5 * * * *', async ()=>{
-  const user = await UsersModel.findOne().sort({tempOrder: -1});
+  const user = await UsersModel.find().sort({tempOrder: -1}).limit(10);
   if( user ){
-    const newWinModel = new WinModel({ username: user.username, userId: user.id, createdAt: new Date()  })
+    const newWinModel = new WinModel({ data: user.map(e=> ({ username: e.username, wins: e.tempWin, userId: e.id })),  createdAt: new Date()  })
     await newWinModel.save();
     await UsersModel.updateMany({}, { $set: { tempWin: 0 } });
   }

@@ -1,19 +1,14 @@
 import {Schema, Document, model} from 'mongoose';
 export interface IWin extends Document{
-  username: string,
-  userId: string,
+  data: any,
   createdAt: Date,
   updatedAt: Date,
   deletedAt?: Date,
 }
 
 const modelSchema = new Schema<IWin>({
-  username: {
-    type: Schema.Types.String,
-  },
-  userId: {
-    type: Schema.Types.String,
-    required: true,
+  data: {
+    type: Schema.Types.Map,
   },
   createdAt: {
     type: Schema.Types.Date,
