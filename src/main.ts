@@ -60,7 +60,6 @@ io.on('connection', socketService.connented.bind(socketService))
 cron.schedule('1 */5 * * * *', async ()=>{
   const user = await UsersModel.find({ win: { $ne: 0 } }).sort({win: -1}).limit(3);
   console.log('1111', user.length , user.length > 0 );
-  if( user.length  > 0){
     try{
       console.log('aaaaaaaaaa');
       const newWinModel = new WinModel({ data: user.map(e=> ({ username: e.username, wins: e.tempWin, userId: e.id })),  createdAt: new Date()  })
@@ -70,7 +69,6 @@ cron.schedule('1 */5 * * * *', async ()=>{
     }catch(e){
       console.log(e);
     }
-  }
 });
 
 // Server setup

@@ -5,6 +5,7 @@ import {UserService} from "../services/UserService";
 import UsersModel from '../schema/UsersModel';
 import {EmailService} from "../email-service/EmailService";
 import WinModel from '../schema/WinModel';
+import { addMinutes, formatDistance } from 'date-fns';
 export class UserController  {
     _userService: UserService;
     _emailService: EmailService;
@@ -20,12 +21,19 @@ export class UserController  {
 
     async leaderboard(req: Request, res: Response){
         const users = await UsersModel.find({ win: { $ne: 0 } }).sort({win: -1}).limit(10).select(['username', 'win']);
-        res.status(HttpStatus.ok).json(successMessage({users}, ''));
+        const win = await WinModel.findOne().sort({ createdAt: -1 });
+        console.log(win?.createdAt);
+        const time = addMinutes(new Date(win?.createdAt || new Date()), 5);
+        console.log(time);
+        const diff = formatDistance(new Date(),time);
+        res.status(HttpStatus.ok).json(successMessage({users,diff}, ''));
     }
 
     async getUserWin(req: Request, res: Response){
-        const win = WinModel.findOne().sort({ createdAt: -1 });
-        res.status(HttpStatus.ok).json(successMessage({win}, ''));
+        const win = await WinModel.findOne().sort({ createdAt: -1 });
+        const time = addMinutes(new Date(win?.createdAt || new Date()), 5);
+        const diff = formatDistance(new Date(), time);
+        res.status(HttpStatus.ok).json(successMessage({win,diff}, ''));
     }
 
     async getUsersFilter(req: Request, res: Response){
