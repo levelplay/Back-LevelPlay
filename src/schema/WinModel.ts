@@ -8,7 +8,7 @@ export interface IWin extends Document{
 
 const modelSchema = new Schema<IWin>({
   data: {
-    type: Schema.Types.Map,
+    type: [Schema.Types.Mixed],
   },
   createdAt: {
     type: Schema.Types.Date,
