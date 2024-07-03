@@ -63,7 +63,8 @@ cron.schedule('1 */5 * * * *', async ()=>{
   if( user.length ){
     const newWinModel = new WinModel({ data: user.map(e=> ({ username: e.username, wins: e.tempWin, userId: e.id })),  createdAt: new Date()  })
     await newWinModel.save();
-    await UsersModel.updateMany({}, { $set: { win: 0 } });
+    const dat = await UsersModel.updateMany({}, { $set: { win: 0 } });
+    console.log(dat);
   }
 });
 
