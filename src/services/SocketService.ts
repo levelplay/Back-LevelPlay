@@ -1,6 +1,7 @@
 import { DisconnectReason, Socket } from "socket.io";
 import RefrachTokenModel from "../schema/RefrachTokenModel";
 import UsersModel from "../schema/UsersModel";
+import WinModel from "../schema/WinModel";
 
 type connectedUsers = {
   client: Socket,
@@ -162,16 +163,16 @@ export class SocketService {
         if(res.turn == 1){
           otherClient?.player1?.client.emit('gameWin', '' );
           otherClient?.player2?.client.emit('gameLose', '' );
-          const user = await UsersModel.findOne({email:  otherClient?.player1.email });
+          const user = await UsersModel.findOne({email:  otherClient?.player1.email});
           if(user){
-            await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
+            await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1, tempWin: (user.tempWin || 0) + 1}});
           }
         }else{
           otherClient?.player2?.client.emit('gameWin', '' );
           otherClient?.player1?.client.emit('gameLose', '' );
           const user = await UsersModel.findOne({email:  otherClient?.player2?.email });
           if(user){
-            await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1}});
+            await UsersModel.updateOne({_id: user._id}, {$set: {win: (user.win || 0) + 1, tempWin: (user.tempWin || 0) + 1}});
           }
         }
         this.tiktakTok.splice(index, 1);

@@ -11,6 +11,9 @@ import bodyParser from "body-parser";
 import { Server } from "socket.io";
 import { createServer }  from 'node:http';
 import { SocketService } from './services/SocketService';
+import cron from 'node-cron';
+import UsersModel from './schema/UsersModel';
+import WinModel from './schema/WinModel';
 // Initialize the express engine
 const exp: express.Application = express();
 const socketService = new SocketService();
@@ -52,6 +55,16 @@ const io = new Server(app, {
 
 io.on('connection', socketService.connented.bind(socketService))
 // io.on('disconnect', socketService.disconnected.bind(socketService))
+
+// for 6 hour * * */6 * * *
+cron.schedule('* * */1 * * *', async ()=>{
+  const user = await UsersModel.findOne().sort({tempOrder: -1});
+  if( user ){
+    const newWinModel = new WinModel({ username: user.username, userId: user.id, createdAt: new Date()  })
+    await newWinModel.save();
+    await UsersModel.updateMany({}, { $set: { tempWin: 0 } });
+  }
+});
 
 // Server setup
 app.listen(envVariables.port, () => {

@@ -3,6 +3,7 @@ import UsersModel from "../schema/UsersModel";
 import RefrachTokenModel from "../schema/RefrachTokenModel";
 import {generatePassword} from "../core/hash";
 import { endOfDay, parse, startOfDay } from "date-fns";
+import WinModel from "../schema/WinModel";
 const sortOption = ['createdAt', 'totalSpend',  'points',  'createdAt',  'lastActive' ]
 const orderOption = [1,  1,-1]
 interface IFilter {
@@ -26,6 +27,10 @@ export class UserService {
 
     async getUserById(userId: string){
         return UsersModel.findOne({_id: userId });
+    }
+
+    async getUserWin(){
+        return WinModel.findOne().sort({ createdAt: -1 });
     }
    
     async userDelete(userId: string,){

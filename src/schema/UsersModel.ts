@@ -1,5 +1,4 @@
 import {Schema, Document, model} from 'mongoose';
-import {EMAIL_REGEX} from '../helper/regex';
 import {passwordHash} from "../database/schema";
 export interface IUser extends Document{
   username: string,
@@ -16,7 +15,8 @@ export interface IUser extends Document{
   deletedAt?: Date,
   lastActive: Date,
   role: number,
-  win: number
+  win: number,
+  tempWin: number,
 }
 
 const modelSchema = new Schema<IUser>({
@@ -36,6 +36,10 @@ const modelSchema = new Schema<IUser>({
     required: [true, 'Role is Required'],
   },
   win: {
+    type: Schema.Types.Number,
+    default: 0
+  },
+  tempWin: {
     type: Schema.Types.Number,
     default: 0
   },

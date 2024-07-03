@@ -23,6 +23,9 @@ router.post('/update', passport.authenticate(userPassport.jwt, {session: false})
 router.get('/leaderboard',
     errorHandler(controller.leaderboard.bind(controller)));
 
+router.get('/lastWin',
+      errorHandler(controller.getUserWin.bind(controller)));
+
 router.post('/update/profile', passport.authenticate(userPassport.jwt, {session: false}),
   upload.single('pic'),
   errorHandler(controller.updateProfile.bind(controller)));

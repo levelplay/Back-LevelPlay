@@ -4,6 +4,7 @@ import { successMessage } from "../core/HttpFunction";
 import {UserService} from "../services/UserService";
 import UsersModel from '../schema/UsersModel';
 import {EmailService} from "../email-service/EmailService";
+import WinModel from '../schema/WinModel';
 export class UserController  {
     _userService: UserService;
     _emailService: EmailService;
@@ -20,6 +21,11 @@ export class UserController  {
     async leaderboard(req: Request, res: Response){
         const users = await UsersModel.find({}).sort({win: -1}).limit(10).select(['username', 'win']);
         res.status(HttpStatus.ok).json(successMessage({users}, ''));
+    }
+
+    async getUserWin(req: Request, res: Response){
+        const win = WinModel.findOne().sort({ createdAt: -1 });
+        res.status(HttpStatus.ok).json(successMessage({win}, ''));
     }
 
     async getUsersFilter(req: Request, res: Response){
