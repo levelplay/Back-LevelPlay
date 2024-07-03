@@ -57,7 +57,7 @@ io.on('connection', socketService.connented.bind(socketService))
 // io.on('disconnect', socketService.disconnected.bind(socketService))
 
 // for 6 hour * * */6 * * *
-cron.schedule('* * */1 * * *', async ()=>{
+cron.schedule('* */5 * * * *', async ()=>{
   const user = await UsersModel.findOne().sort({tempOrder: -1});
   if( user ){
     const newWinModel = new WinModel({ username: user.username, userId: user.id, createdAt: new Date()  })
