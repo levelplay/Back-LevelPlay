@@ -57,7 +57,7 @@ io.on('connection', socketService.connented.bind(socketService))
 // io.on('disconnect', socketService.disconnected.bind(socketService))
 
 // for 6 hour * * */6 * * *
-cron.schedule('1 */5 * * * *', async ()=>{
+cron.schedule('1 */30 * * * *', async ()=>{
   const user = await UsersModel.find({ win: { $ne: 0 } }).sort({win: -1}).limit(3);
   console.log('1111', user.length , user.length > 0 );
     try{

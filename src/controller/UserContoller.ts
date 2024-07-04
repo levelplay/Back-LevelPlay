@@ -22,11 +22,9 @@ export class UserController  {
     async leaderboard(req: Request, res: Response){
         const users = await UsersModel.find({ win: { $ne: 0 } }).sort({win: -1}).limit(10).select(['username', 'win']);
         const win = await WinModel.findOne().sort({ createdAt: -1 });
-        console.log(win?.createdAt);
-        const time = addMinutes(new Date(win?.createdAt || new Date()), 5);
-        console.log(time);
+        const time = addMinutes(new Date(win?.createdAt || new Date()), 30);
         const diff = formatDistance(new Date(),time);
-        res.status(HttpStatus.ok).json(successMessage({users,diff}, ''));
+        res.status(HttpStatus.ok).json(successMessage({users,diff,time}, ''));
     }
 
     async getUserWin(req: Request, res: Response){
