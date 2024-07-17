@@ -33,11 +33,6 @@ export class UserAuth extends Auth {
 
     async register(req: Request, res: Response){
         const body = req.body;
-        const otp = await this._otpService.getOtp(body.email, body.code, OtpRoles.NEW_ACCOUNT);
-        if(!otp){
-            res.status(HttpStatus.badRequest).json(errorMessage('Invalid otp'));
-            return;
-        }
         let oldUser = await this._userService.getUserByEmail( body.email);
         if(oldUser){
             if(oldUser.deletedAt){
@@ -76,11 +71,11 @@ export class UserAuth extends Auth {
         }
         const otp = generateOTP(6);
         if(query.type === OtpRoles.NEW_ACCOUNT.toString()) {
-            if(user){
-                res.status(HttpStatus.badRequest).json(errorMessage('User Already exist.'));
-                return;
-            }
-            await this._otpService.createOtp(query.email, otp, OtpRoles.NEW_ACCOUNT);
+            // if(user){
+            //     res.status(HttpStatus.badRequest).json(errorMessage('User Already exist.'));
+            //     return;
+            // }
+            // await this._otpService.createOtp(query.email, otp, OtpRoles.NEW_ACCOUNT);
             await this._email.otp(query.email, otp);
             res.send(successMessage(null, 'Please check email.'));
         }else{

@@ -21,7 +21,6 @@ interface IFilter {
     'facebook',
     'email',
  ]
-  
 
 export class UserService {
 

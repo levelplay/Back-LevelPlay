@@ -27,8 +27,9 @@ export class EmailService {
             from: envVariables.email.from,
             subject: "Verification",
             text: `Otp code: ${code}!`,
-            html:this.template('otp', {code, logo: envVariables.baseUrl+ "uploads/logo/black-logo.png"})
+            html: `<h1>hello</h1>`
         });
+        console.log(data);
     }
 
     template(name: string, data: any){
