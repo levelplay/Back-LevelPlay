@@ -6,6 +6,7 @@ import UsersModel from '../schema/UsersModel';
 import {EmailService} from "../email-service/EmailService";
 import WinModel from '../schema/WinModel';
 import { addMinutes, formatDistance } from 'date-fns';
+import ChatModel from '../schema/ChatModel';
 export class UserController  {
     _userService: UserService;
     _emailService: EmailService;
@@ -55,6 +56,17 @@ export class UserController  {
         const user: any = req?.user;
         await this._userService.updateUser(user?._id, req.body);
         res.status(HttpStatus.ok).json(successMessage(null, 'User Updated'));
+    }
+
+    async getChat(req: Request, res: Response){
+        const user: any = req?.user;
+        const chats = ChatModel.find({ $or: 
+            [ 
+                { $and: [ {senderId: user?._id}, {receiverId:req.query.userId } ] },
+                { $and: [ {receiverId: user?._id}, {senderId:req.query.userId } ] },
+            ]
+         }).populate(['senderId', 'receiverId']).sort({ createdAt: -1 })
+        res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
     }
 
     async updateProfile(req: Request, res: Response){

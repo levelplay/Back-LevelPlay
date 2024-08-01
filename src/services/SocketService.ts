@@ -2,6 +2,7 @@ import { DisconnectReason, Socket } from "socket.io";
 import RefrachTokenModel from "../schema/RefrachTokenModel";
 import UsersModel from "../schema/UsersModel";
 import WinModel from "../schema/WinModel";
+import ChatModel from "../schema/ChatModel";
 
 type connectedUsers = {
   client: Socket,
@@ -29,6 +30,7 @@ export class SocketService {
     socket.on('reject', (data)=> this.reject(socket.id, data));
     socket.on('turn', (data)=> this.turn(socket.id, data));
     socket.on('quit', (data)=> this.quit(socket.id));
+    socket.on('chat', (data)=> this.chat(socket.id, data));
     socket.on('disconnect', (reson: DisconnectReason, description: any) => this.disconnected(socket.id));
     let email = ''
     let username = ''
@@ -52,6 +54,21 @@ export class SocketService {
     this.connectedUsers = filter;
     const gameFilters = this.waitingUser.filter(e=> e.player1.clientId != id && (e.player2 == null || e.player2.clientId != id));
     this.waitingUser = gameFilters;
+  }
+  async chat(id: string, data: any){
+    const client = this.connectedUsers.find(e=> e.clientId == id);
+    const otherUser = this.connectedUsers.find(e=> e.email == data?.email );
+    if(client){
+      const findUser = await UsersModel.findOne({ email: client?.email  });
+      if(findUser){
+        const newChat = new ChatModel({ receiverId:data.id, senderId: client?.email, message: data.message  });
+        newChat.save();
+        const chat = await ChatModel.findById(newChat.id);
+        if( otherUser && chat ){
+          otherUser.client.emit('newChat', chat?.toJSON());
+        }
+      }
+    }
   }
   async quit(id: string){
     const otherClient = this.tiktakTok.find((e)=> e.player1.clientId == id || e.player2?.clientId == id);

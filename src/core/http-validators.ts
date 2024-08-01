@@ -21,6 +21,10 @@ export const updateUser = Joi.object({
     about: Joi.string().required(),
 })
 
+export const getChatId = Joi.object({
+    userId: Joi.string().required(),
+})
+
 export const updateUserSetting = Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),

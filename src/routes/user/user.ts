@@ -3,7 +3,7 @@ import {errorHandler} from "../../helper/errorHandler";
 import passport from "passport";
 import {userPassport} from "../../auth/passport-user";
 import {UserController} from "../../controller/UserContoller";
-import {bodyValidator, updateUser, updateUserSetting} from "../../core/http-validators";
+import {bodyValidator, getChatId, queryValidator, updateUser, updateUserSetting} from "../../core/http-validators";
 import multer from "multer";
 
 const upload = multer({
@@ -19,6 +19,9 @@ const router = express.Router();
 
 router.post('/update', passport.authenticate(userPassport.jwt, {session: false}), bodyValidator(updateUser),
     errorHandler(controller.updateUser.bind(controller)));
+
+router.get('/chat', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(getChatId),
+    errorHandler(controller.getChat.bind(controller)));
 
 router.get('/leaderboard',
     errorHandler(controller.leaderboard.bind(controller)));
