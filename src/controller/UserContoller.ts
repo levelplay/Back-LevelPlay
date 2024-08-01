@@ -60,8 +60,8 @@ export class UserController  {
 
     async getChat(req: Request, res: Response){
         const user: any = req?.user;
-        const chats = ChatModel.find({ $or: 
-            [ 
+        const chats = ChatModel.find({ 
+            $or: [ 
                 { $and: [ {senderId: user?._id}, {receiverId:req.query.userId } ] },
                 { $and: [ {receiverId: user?._id}, {senderId:req.query.userId } ] },
             ]
