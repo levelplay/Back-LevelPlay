@@ -61,7 +61,7 @@ export class SocketService {
     if(client){
       const findUser = await UsersModel.findOne({ email: client?.email  });
       if(findUser){
-        const newChat = new ChatModel({ receiverId:data.id, senderId: findUser?.id, message: data.message  });
+        const newChat = new ChatModel({ receiverId:data.id, senderId: findUser?.id, message: data.message, contactId: data.contactId  });
         newChat.save();
         const chat = await ChatModel.findById(newChat.id);
         if( otherUser && chat ){

@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import { HttpStatus} from "../core/env-variables";
-import { successMessage } from "../core/HttpFunction";
+import { errorMessage, successMessage } from "../core/HttpFunction";
 import {UserService} from "../services/UserService";
 import UsersModel from '../schema/UsersModel';
 import {EmailService} from "../email-service/EmailService";
@@ -60,50 +60,45 @@ export class UserController  {
     }
 
     async getChat(req: Request, res: Response){
-        const user: any = req?.user;
         const chats = ChatModel.find({ 
-            $or: [ 
-                { $and: [ {senderId: user?._id}, {receiverId:req.query.userId } ] },
-                { $and: [ {receiverId: user?._id}, {senderId:req.query.userId } ] },
-            ]
+            contactId: req.query.contactId
          }).populate(['senderId', 'receiverId']).sort({ createdAt: -1 })
         res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
     }
 
-
     async getContact(req: Request, res: Response){
         const user: any = req?.user;
         const chats = ContactModel.find({ 
-            userId: user?._id
+            $or: [
+                {
+                    userId: user?._id
+                },
+                {
+                    otherUser: user?._id
+                }
+            ]
          }).populate(['userId', 'otherUser']).sort({ createdAt: -1 })
         res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
     }
 
     async addContact(req: Request, res: Response){
         const user: any = req?.user;
+        const otherUser = await UsersModel.findOne({ email: req.query.email });
+        if(!otherUser){
+            res.status(HttpStatus.badRequest).json(errorMessage('User Not Found'));
+            return;
+        }
         const contactNew = new ContactModel({ 
             userId: user?._id,
-            otherUser: req.query.userId
+            otherUser: otherUser._id
          })
         await contactNew.save();
-
-        const contactNewOther = new ContactModel({ 
-            userId: req.query.userId ,
-            otherUser: user?._id
-         })
-        await contactNewOther.save();
         res.status(HttpStatus.ok).json(successMessage(null, 'Contact added'));
     }
 
     async removeContact(req: Request, res: Response){
-        const user: any = req?.user;
-        await ContactModel.deleteOne({ 
-            userId: user?._id,
-            otherUser: req.query.userId
-         });
          await ContactModel.deleteOne({ 
-            userId: req.query.userId ,
-            otherUser: user?._id
+            _id: req.query.id,
          });
         res.status(HttpStatus.ok).json(successMessage(null, 'Contact removed'));
     }

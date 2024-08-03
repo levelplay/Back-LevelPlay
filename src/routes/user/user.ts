@@ -3,7 +3,7 @@ import {errorHandler} from "../../helper/errorHandler";
 import passport from "passport";
 import {userPassport} from "../../auth/passport-user";
 import {UserController} from "../../controller/UserContoller";
-import {bodyValidator, getChatId, queryValidator, updateUser, updateUserSetting} from "../../core/http-validators";
+import {addContact, bodyValidator, getChatId, queryValidator, removeContact, updateUser, updateUserSetting} from "../../core/http-validators";
 import multer from "multer";
 
 const upload = multer({
@@ -22,12 +22,11 @@ router.post('/update', passport.authenticate(userPassport.jwt, {session: false})
 
 router.get('/chat', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(getChatId),
     errorHandler(controller.getChat.bind(controller)));
-
-    router.get('/contact', passport.authenticate(userPassport.jwt, {session: false}),
+router.get('/contact', passport.authenticate(userPassport.jwt, {session: false}),
     errorHandler(controller.getContact.bind(controller)));
-    router.post('/contact', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(getChatId),
+router.post('/contact', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(addContact),
     errorHandler(controller.addContact.bind(controller)));
-    router.delete('/contact', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(getChatId),
+router.delete('/contact', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(removeContact),
     errorHandler(controller.removeContact.bind(controller)));
 
 router.get('/leaderboard',

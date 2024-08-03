@@ -1,7 +1,6 @@
 import {Schema, Document, model} from 'mongoose';
 import UsersModel from './UsersModel';
 interface IModel extends Document{
-  message: string,
   userId: Schema.Types.ObjectId,
   otherUser: Schema.Types.ObjectId,
   createdAt: Date,
@@ -15,10 +14,6 @@ const ContactSchema = new Schema<IModel>({
   otherUser: {
     type: Schema.Types.ObjectId,
     ref: UsersModel
-  },
-  message: {
-    type: Schema.Types.String,
-    required: true,
   },
   createdAt: {
     type: Schema.Types.Date,

@@ -22,7 +22,15 @@ export const updateUser = Joi.object({
 })
 
 export const getChatId = Joi.object({
-    userId: Joi.string().required(),
+    contactId: Joi.string().required(),
+})
+
+export const addContact = Joi.object({
+    email: Joi.string().email().required(),
+})
+
+export const removeContact = Joi.object({
+    id: Joi.string().required(),
 })
 
 export const updateUserSetting = Joi.object({
