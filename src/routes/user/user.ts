@@ -23,6 +23,13 @@ router.post('/update', passport.authenticate(userPassport.jwt, {session: false})
 router.get('/chat', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(getChatId),
     errorHandler(controller.getChat.bind(controller)));
 
+    router.get('/contact', passport.authenticate(userPassport.jwt, {session: false}),
+    errorHandler(controller.getContact.bind(controller)));
+    router.post('/contact', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(getChatId),
+    errorHandler(controller.addContact.bind(controller)));
+    router.delete('/contact', passport.authenticate(userPassport.jwt, {session: false}), queryValidator(getChatId),
+    errorHandler(controller.removeContact.bind(controller)));
+
 router.get('/leaderboard',
     errorHandler(controller.leaderboard.bind(controller)));
 

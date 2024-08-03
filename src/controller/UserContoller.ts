@@ -7,6 +7,7 @@ import {EmailService} from "../email-service/EmailService";
 import WinModel from '../schema/WinModel';
 import { addMinutes, formatDistance } from 'date-fns';
 import ChatModel from '../schema/ChatModel';
+import ContactModel from '../schema/ContactModel';
 export class UserController  {
     _userService: UserService;
     _emailService: EmailService;
@@ -67,6 +68,44 @@ export class UserController  {
             ]
          }).populate(['senderId', 'receiverId']).sort({ createdAt: -1 })
         res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
+    }
+
+
+    async getContact(req: Request, res: Response){
+        const user: any = req?.user;
+        const chats = ContactModel.find({ 
+            userId: user?._id
+         }).populate(['userId', 'otherUser']).sort({ createdAt: -1 })
+        res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
+    }
+
+    async addContact(req: Request, res: Response){
+        const user: any = req?.user;
+        const contactNew = new ContactModel({ 
+            userId: user?._id,
+            otherUser: req.query.userId
+         })
+        await contactNew.save();
+
+        const contactNewOther = new ContactModel({ 
+            userId: req.query.userId ,
+            otherUser: user?._id
+         })
+        await contactNewOther.save();
+        res.status(HttpStatus.ok).json(successMessage(null, 'Contact added'));
+    }
+
+    async removeContact(req: Request, res: Response){
+        const user: any = req?.user;
+        await ContactModel.deleteOne({ 
+            userId: user?._id,
+            otherUser: req.query.userId
+         });
+         await ContactModel.deleteOne({ 
+            userId: req.query.userId ,
+            otherUser: user?._id
+         });
+        res.status(HttpStatus.ok).json(successMessage(null, 'Contact removed'));
     }
 
     async updateProfile(req: Request, res: Response){
