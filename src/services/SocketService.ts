@@ -58,13 +58,14 @@ export class SocketService {
   async chat(id: string, data: any){
     const client = this.connectedUsers.find(e=> e.clientId == id);
     const otherUser = this.connectedUsers.find(e=> e.email == data?.email );
+    console.log(this.connectedUsers, data?.email );
     if(client){
       const findUser = await UsersModel.findOne({ email: client?.email  });
       if(findUser){
         const newChat = new ChatModel({ receiverId:data.id, 
           senderId: findUser?.id, message: data.message, contactId: data.contactId, createdAt: new Date()  });
         newChat.save();
-        const chat = await ChatModel.findById(newChat.id);
+        const chat = await ChatModel.findById(newChat.id).populate(['senderId', 'receiverId']);
         if( otherUser && chat ){
           otherUser.client.emit('newChat', chat?.toJSON());
         }
