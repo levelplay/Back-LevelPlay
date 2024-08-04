@@ -60,7 +60,7 @@ export class UserController  {
     }
 
     async getChat(req: Request, res: Response){
-        const chats = ChatModel.find({ 
+        const chats = await ChatModel.find({ 
             contactId: req.query.contactId
          }).populate(['senderId', 'receiverId']).sort({ createdAt: -1 })
         res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
