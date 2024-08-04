@@ -82,7 +82,9 @@ export class UserController  {
         const chats = [];
         for(let contactsId of contactsIds){
             const chat = await ChatModel.findOne({ contactId: contactsId }).sort({  createdAt: -1  })
-            chats.push(chat?.toJSON());
+            if( chat ){
+                chats.push(chat?.toJSON());
+            }
         }
         res.status(HttpStatus.ok).json(successMessage({contacts, chats}, 'User Updated'));
     }
