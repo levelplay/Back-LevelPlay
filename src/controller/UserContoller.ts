@@ -68,7 +68,7 @@ export class UserController  {
 
     async getContact(req: Request, res: Response){
         const user: any = req?.user;
-        const contacts = ContactModel.find({ 
+        const contacts = await ContactModel.find({ 
             $or: [
                 {
                     userId: user?._id
@@ -78,11 +78,11 @@ export class UserController  {
                 }
             ]
          }).populate(['userId', 'otherUser']).sort({ createdAt: -1 });
-        const contactsIds = (await contacts).map(e=> e._id);
+        const contactsIds = contacts.map(e=> e._id);
         const chats = [];
         for(let contactsId of contactsIds){
             const chat = await ChatModel.findOne({ contactId: contactsId }).sort({  createdAt: -1  })
-            chats.push(chat);
+            chats.push(chat?.toJSON());
         }
         res.status(HttpStatus.ok).json(successMessage({contacts, chats}, 'User Updated'));
     }
