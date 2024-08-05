@@ -23,6 +23,8 @@ export const updateUser = Joi.object({
 
 export const getChatId = Joi.object({
     contactId: Joi.string().required(),
+    count: Joi.number().required(),
+    limit: Joi.number().required(),
 })
 
 export const addContact = Joi.object({
