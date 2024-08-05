@@ -9,7 +9,7 @@ interface IModel extends Document{
 const ContactSchema = new Schema<IModel>({
   userId: {
     type: Schema.Types.String,
-    required: true,
+    ref: UsersModel
   },
   otherUser: {
     type: Schema.Types.ObjectId,
