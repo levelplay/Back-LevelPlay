@@ -66,7 +66,7 @@ export class SocketService {
       if(findUser){
         const newChat = new ChatModel({ receiverId:data.id, 
           senderId: findUser?.id, message: data.message, contactId: data.contactId, createdAt: new Date()  });
-        newChat.save();
+        await newChat.save();
         const chat = await ChatModel.findById(newChat._id).populate(['senderId', 'receiverId']);
     console.log(chat, 'chat' );
 
