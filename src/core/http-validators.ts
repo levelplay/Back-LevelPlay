@@ -27,6 +27,11 @@ export const getChatId = Joi.object({
     limit: Joi.number().required(),
 })
 
+export const getChatGloble = Joi.object({
+    count: Joi.number().required(),
+    limit: Joi.number().required(),
+})
+
 export const addContact = Joi.object({
     email: Joi.string().email().required(),
 })

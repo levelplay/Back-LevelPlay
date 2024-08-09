@@ -8,6 +8,7 @@ import WinModel from '../schema/WinModel';
 import { addMinutes, formatDistance } from 'date-fns';
 import ChatModel from '../schema/ChatModel';
 import ContactModel from '../schema/ContactModel';
+import GlobleChatModel from '../schema/GlobleChatModel';
 export class UserController  {
     _userService: UserService;
     _emailService: EmailService;
@@ -68,6 +69,12 @@ export class UserController  {
         res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
     }
 
+    async getChatGloble(req: Request, res: Response){
+        const count:string = req.query.count as string;
+        const limit:string = req.query.limit as string;
+        const chats = await GlobleChatModel.find({ }).skip(parseInt(count || '0')).limit(parseInt(limit || '0')).populate(['userId']).sort({ createdAt: -1 })
+        res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
+    }
     async getContact(req: Request, res: Response){
         const user: any = req?.user;
         const contacts = await ContactModel.find({ 

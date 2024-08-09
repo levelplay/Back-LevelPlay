@@ -3,6 +3,7 @@ import RefrachTokenModel from "../schema/RefrachTokenModel";
 import UsersModel from "../schema/UsersModel";
 import WinModel from "../schema/WinModel";
 import ChatModel from "../schema/ChatModel";
+import GlobleChatModel from "../schema/GlobleChatModel";
 
 type connectedUsers = {
   client: Socket,
@@ -31,6 +32,7 @@ export class SocketService {
     socket.on('turn', (data)=> this.turn(socket.id, data));
     socket.on('quit', (data)=> this.quit(socket.id));
     socket.on('chat', (data)=> this.chat(socket.id, data));
+    socket.on('chat-globle', (data)=> this.chatGloble(socket.id, data));
     socket.on('disconnect', (reson: DisconnectReason, description: any) => this.disconnected(socket.id));
     let email = ''
     let username = ''
@@ -54,6 +56,22 @@ export class SocketService {
     this.connectedUsers = filter;
     const gameFilters = this.waitingUser.filter(e=> e.player1.clientId != id && (e.player2 == null || e.player2.clientId != id));
     this.waitingUser = gameFilters;
+  }
+  async chatGloble(id: string, data: any){
+    const client = this.connectedUsers.find(e=> e.clientId == id);
+    const otherUser = this.connectedUsers.filter(e=> e.clientId != id);
+    if(client){
+      const findUser = await UsersModel.findOne({ email: client?.email  });
+      if(findUser){
+        const newChat = new GlobleChatModel({ userId:data.id, message: data.message,
+          createdAt: new Date()  });
+        await newChat.save();
+        const chat = await GlobleChatModel.findById(newChat._id).populate(['userId']);
+        if( otherUser.length && chat ){
+          otherUser.forEach(e=> e.client.emit('newChatGloble', chat?.toJSON()));
+        }
+      }
+    }
   }
   async chat(id: string, data: any){
     const client = this.connectedUsers.find(e=> e.clientId == id);
