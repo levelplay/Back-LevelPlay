@@ -72,7 +72,7 @@ export class UserController  {
     async getChatGloble(req: Request, res: Response){
         const count:string = req.query.count as string;
         const limit:string = req.query.limit as string;
-        const chats = await GlobleChatModel.find({ }).skip(parseInt(count || '0')).limit(parseInt(limit || '0')).populate(['userId']).sort({ createdAt: -1 })
+        const chats = await GlobleChatModel.find({ }).skip(parseInt(count || '0')).limit(parseInt(limit || '0')).populate(['userId']).sort({ createdAt: 1 })
         res.status(HttpStatus.ok).json(successMessage(chats, 'User Updated'));
     }
     async getContact(req: Request, res: Response){
