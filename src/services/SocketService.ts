@@ -160,7 +160,7 @@ export class SocketService {
       }
       const runningGame =this.tiktakTok.find(e=> e.player1.email == res.user && e.player2?.email == client.email);
       if(runningGame){
-        client?.client.emit('error', 'Alredy in Game');
+        client?.client.emit('error', 'Already in Game');
         return;
       }
       if(res.accept == false){
@@ -236,7 +236,7 @@ export class SocketService {
         client?.client.emit('error', 'User not Found');
         return ;
       }
-      otherClient.client.emit('gameChallenge', client?.email);
+      otherClient.client.emit('gameChallenge', JSON.stringify({ email: client?.email, username: client?.username }));
       this.waitingUser.push({player1: client, player2: otherClient});
       return;
     }
@@ -244,7 +244,7 @@ export class SocketService {
     if(!single){
       const exist = this.waitingUser.find(e=> e.player1.email == client.email || e.player2?.email == client.email);
       if(exist){
-        client?.client.emit('error', 'User is Alredy in wating List');
+        client?.client.emit('error', 'User is Already in waiting List');
         return;
       }
       this.waitingUser.push({player1: client, player2: null});
